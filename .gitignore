@@ -4,3 +4,6 @@ node_modules
 .idea
 target
 *.iml
+.gradle/
+build/
+allure-results/
