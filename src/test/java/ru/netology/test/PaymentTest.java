@@ -1,7 +1,10 @@
 package ru.netology.test;
 
 import com.codeborne.selenide.Configuration;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.netology.data.DataHelper;
 import ru.netology.data.SQLHelper;
@@ -11,6 +14,8 @@ import ru.netology.page.PaymentPage;
 import static com.codeborne.selenide.Selenide.open;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Epic("Путешествие дня")
+@Feature("Оплата тура")
 public class PaymentTest {
 
     @BeforeAll
@@ -19,6 +24,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Успешная оплата тура картой со статусом APPROVED")
     void shouldPayWithApprovedCard() {
         open("/");
 
@@ -43,6 +49,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Отказ в оплате тура картой со статусом DECLINED")
     void shouldNotPayWithDeclinedCard() {
         open("/");
 
@@ -64,6 +71,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при пустом номере карты")
     void shouldShowErrorWithEmptyCardNumber() {
         open("/");
 
@@ -85,6 +93,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при неполном номере карты")
     void shouldShowErrorWithIncompleteCardNumber() {
         open("/");
 
@@ -106,6 +115,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при пустом месяце")
     void shouldShowErrorWithEmptyMonth() {
         open("/");
 
@@ -127,6 +137,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при некорректном месяце")
     void shouldShowErrorWithInvalidMonth() {
         open("/");
 
@@ -148,6 +159,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при пустом годе")
     void shouldShowErrorWithEmptyYear() {
         open("/");
 
@@ -169,6 +181,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при истёкшем сроке действия карты")
     void shouldShowErrorWithExpiredYear() {
         open("/");
 
@@ -190,6 +203,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при пустом поле владельца")
     void shouldShowErrorWithEmptyHolder() {
         open("/");
 
@@ -211,6 +225,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при некорректном имени владельца")
     void shouldShowErrorWithInvalidHolder() {
         open("/");
 
@@ -232,6 +247,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при пустом CVC")
     void shouldShowErrorWithEmptyCvc() {
         open("/");
 
@@ -253,6 +269,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Ошибка при некорректном CVC")
     void shouldShowErrorWithInvalidCvc() {
         open("/");
 
@@ -275,6 +292,7 @@ public class PaymentTest {
 
 
     @Test
+    @DisplayName("Сохранение статуса DECLINED в БД при оплате отклонённой картой")
     void shouldSaveDeclinedStatusInDatabase() {
         open("/");
 
@@ -298,6 +316,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Успешная покупка тура в кредит картой со статусом APPROVED")
     void shouldCreditWithApprovedCard() {
         open("/");
 
@@ -319,6 +338,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Отказ в покупке тура в кредит картой со статусом DECLINED")
     void shouldNotCreditWithDeclinedCard() {
         open("/");
 
@@ -340,6 +360,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Сохранение статуса DECLINED в БД при покупке в кредит")
     void shouldSaveDeclinedCreditStatusInDatabase() {
         open("/");
 
@@ -362,6 +383,7 @@ public class PaymentTest {
     }
 
     @Test
+    @DisplayName("Сохранение статуса APPROVED в БД при покупке в кредит")
     void shouldSaveApprovedCreditStatusInDatabase() {
         open("/");
 
@@ -381,5 +403,205 @@ public class PaymentTest {
 
         String status = SQLHelper.waitForCreditStatus("APPROVED");
         assertEquals("APPROVED", status);
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при пустом номере карты")
+    void shouldShowErrorWithEmptyCardNumberInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                "",
+                DataHelper.getValidMonth(),
+                DataHelper.getValidYear(),
+                DataHelper.getValidHolder(),
+                DataHelper.getValidCvc()
+        );
+
+        creditPage.submit();
+        creditPage.checkCardNumberError();
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при неполном номере карты")
+    void shouldShowErrorWithIncompleteCardNumberInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                "4444 4444 4444 444",
+                DataHelper.getValidMonth(),
+                DataHelper.getValidYear(),
+                DataHelper.getValidHolder(),
+                DataHelper.getValidCvc()
+        );
+
+        creditPage.submit();
+        creditPage.checkCardNumberError();
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при пустом месяце")
+    void shouldShowErrorWithEmptyMonthInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                DataHelper.getApprovedCardNumber(),
+                "",
+                DataHelper.getValidYear(),
+                DataHelper.getValidHolder(),
+                DataHelper.getValidCvc()
+        );
+
+        creditPage.submit();
+        creditPage.checkMonthError();
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при некорректном месяце")
+    void shouldShowErrorWithInvalidMonthInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                DataHelper.getApprovedCardNumber(),
+                "13",
+                DataHelper.getValidYear(),
+                DataHelper.getValidHolder(),
+                DataHelper.getValidCvc()
+        );
+
+        creditPage.submit();
+        creditPage.checkMonthError();
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при пустом годе")
+    void shouldShowErrorWithEmptyYearInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                DataHelper.getApprovedCardNumber(),
+                DataHelper.getValidMonth(),
+                "",
+                DataHelper.getValidHolder(),
+                DataHelper.getValidCvc()
+        );
+
+        creditPage.submit();
+        creditPage.checkYearError();
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при истёкшем сроке действия карты")
+    void shouldShowErrorWithExpiredYearInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                DataHelper.getApprovedCardNumber(),
+                DataHelper.getValidMonth(),
+                "25",
+                DataHelper.getValidHolder(),
+                DataHelper.getValidCvc()
+        );
+
+        creditPage.submit();
+        creditPage.checkYearError();
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при пустом поле владельца")
+    void shouldShowErrorWithEmptyHolderInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                DataHelper.getApprovedCardNumber(),
+                DataHelper.getValidMonth(),
+                DataHelper.getValidYear(),
+                "",
+                DataHelper.getValidCvc()
+        );
+
+        creditPage.submit();
+        creditPage.checkHolderError();
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при некорректном имени владельца")
+    void shouldShowErrorWithInvalidHolderInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                DataHelper.getApprovedCardNumber(),
+                DataHelper.getValidMonth(),
+                DataHelper.getValidYear(),
+                "12345",
+                DataHelper.getValidCvc()
+        );
+
+        creditPage.submit();
+        creditPage.checkHolderError();
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при пустом CVC")
+    void shouldShowErrorWithEmptyCvcInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                DataHelper.getApprovedCardNumber(),
+                DataHelper.getValidMonth(),
+                DataHelper.getValidYear(),
+                DataHelper.getValidHolder(),
+                ""
+        );
+
+        creditPage.submit();
+        creditPage.checkCvcError();
+    }
+
+    @Test
+    @DisplayName("Кредит: ошибка при некорректном CVC")
+    void shouldShowErrorWithInvalidCvcInCreditForm() {
+        open("/");
+
+        CreditPage creditPage = new CreditPage();
+        creditPage.openCreditForm();
+
+        creditPage.fillCard(
+                DataHelper.getApprovedCardNumber(),
+                DataHelper.getValidMonth(),
+                DataHelper.getValidYear(),
+                DataHelper.getValidHolder(),
+                "12"
+        );
+
+        creditPage.submit();
+        creditPage.checkCvcError();
     }
 }

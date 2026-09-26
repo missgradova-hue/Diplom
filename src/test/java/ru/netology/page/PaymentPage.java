@@ -24,13 +24,13 @@ public class PaymentPage {
             $("input[placeholder='22']");
 
     private final SelenideElement holder =
-            $$("input").get(3);
+            $("input.input__control:not([placeholder])");
 
     private final SelenideElement cvc =
             $("input[placeholder='999']");
 
     private final SelenideElement continueButton =
-            $$("button.button").last();
+            $("form").$("button.button_view_extra");
 
     private final SelenideElement successNotification =
             $(".notification_status_ok");

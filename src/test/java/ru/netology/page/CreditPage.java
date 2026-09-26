@@ -7,12 +7,11 @@ import java.time.Duration;
 
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
 
 public class CreditPage {
 
     private final SelenideElement creditButton =
-            $$("button.button").get(1);
+            $("button.button_view_extra");
 
     private final SelenideElement cardNumber =
             $("input[placeholder='0000 0000 0000 0000']");
@@ -24,19 +23,34 @@ public class CreditPage {
             $("input[placeholder='22']");
 
     private final SelenideElement holder =
-            $$("input").get(3);
+            $("input.input__control:not([placeholder])");
 
     private final SelenideElement cvc =
             $("input[placeholder='999']");
 
     private final SelenideElement continueButton =
-            $$("button.button").last();
+            $("form").$("button.button_view_extra");
 
     private final SelenideElement successNotification =
             $(".notification_status_ok");
 
     private final SelenideElement errorNotification =
             $(".notification_status_error");
+
+    private final SelenideElement cardNumberError =
+            cardNumber.closest(".input").$(".input__sub");
+
+    private final SelenideElement monthError =
+            month.closest(".input").$(".input__sub");
+
+    private final SelenideElement yearError =
+            year.closest(".input").$(".input__sub");
+
+    private final SelenideElement holderError =
+            holder.closest(".input").$(".input__sub");
+
+    private final SelenideElement cvcError =
+            cvc.closest(".input").$(".input__sub");
 
 
     public void openCreditForm() {
@@ -74,5 +88,23 @@ public class CreditPage {
         );
     }
 
+    public void checkCardNumberError() {
+        cardNumberError.shouldBe(visible);
+    }
 
+    public void checkMonthError() {
+        monthError.shouldBe(visible);
+    }
+
+    public void checkYearError() {
+        yearError.shouldBe(visible);
+    }
+
+    public void checkHolderError() {
+        holderError.shouldBe(visible);
+    }
+
+    public void checkCvcError() {
+        cvcError.shouldBe(visible);
+    }
 }

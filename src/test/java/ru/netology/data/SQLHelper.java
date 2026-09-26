@@ -4,13 +4,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import java.time.Duration;
+
+import static org.awaitility.Awaitility.await;
+
 public class SQLHelper {
 
     private static final String URL =
-            "jdbc:mysql://localhost:3306/app";
+            System.getProperty("db.url", "jdbc:mysql://localhost:3306/app");
 
-    private static final String USER = "app";
-    private static final String PASSWORD = "pass";
+    private static final String USER =
+            System.getProperty("db.user", "app");
+
+    private static final String PASSWORD =
+            System.getProperty("db.password", "pass");
 
     private SQLHelper() {
     }
@@ -38,19 +45,10 @@ public class SQLHelper {
     }
 
     public static String waitForPaymentStatus(String expectedStatus) {
-        for (int i = 0; i < 10; i++) {
-            String status = getLastPaymentStatus();
-
-            if (expectedStatus.equals(status)) {
-                return status;
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        await()
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(500))
+                .until(() -> expectedStatus.equals(getLastPaymentStatus()));
 
         return getLastPaymentStatus();
     }
@@ -75,19 +73,10 @@ public class SQLHelper {
     }
 
     public static String waitForCreditStatus(String expectedStatus) {
-        for (int i = 0; i < 10; i++) {
-            String status = getLastCreditStatus();
-
-            if (expectedStatus.equals(status)) {
-                return status;
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        await()
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(500))
+                .until(() -> expectedStatus.equals(getLastCreditStatus()));
 
         return getLastCreditStatus();
     }
